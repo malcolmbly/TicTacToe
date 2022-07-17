@@ -10,32 +10,43 @@ module TicTacToeGame
       @player1 = HumanPlayer.new(input_player_name, "X")
       puts 'Player Two Info:'
       @player2 = HumanPlayer.new(input_player_name, "O")
-      @next_move = @player1
-      take_turn(@next_move)
+      @next_player = @player1
+      play_game
     end
 
-    def input_player_name()
+    def play_game
+      until game_over?
+        move = get_move(@next_player)
+        @board.fill_space(move, next_move.symbol) if move_is_valid?
+        @next_player =
+          @next_player == @player1 ? @player2 : @player1
+      end
+    end
+
+    def input_player_name
       puts 'Enter Player Name:'
       gets.chomp
     end
 
-    def take_turn(next_move)
-      puts "#{next_move.name}\'s turn\n"
+    def get_move(next_player)
       available_moves = @board.available_spaces.keys
+      puts "#{next_player.name}\'s turn"
       puts "Available moves: #{available_moves}"
-      puts 'Type your next move from available list:\n'
-      move = gets.chomp
-      if available_moves.include?(move)
-        @board.fill_space(move, next_move.symbol)
-        next_move = 
-          next_move == @player1 ? @player2 : @player1 
-      end
-      take_turn(next_move) unless game_over?
+      puts 'Type your next move from available list:'
+      gets.chomp
+    end
+
+    def move_is_valid?(move)
+      @board.available_spaces.keys.includes?(move)
     end
 
     def game_over?
-      #PLACEHOLDER, NEEDS TO BE IMPLEMENTED
+      # PLACEHOLDER, NEEDS TO BE IMPLEMENTED
       false
+    end
+
+    def show_game_over
+      # TO BE IMPLEMENTED
     end
   end
 
@@ -57,6 +68,7 @@ module TicTacToeGame
     def available_spaces()
       @grid.select { |_, symbol| symbol.zero? }
     end
+    #TODO: ADD to_s method for the game board.
   end
 
   class HumanPlayer
