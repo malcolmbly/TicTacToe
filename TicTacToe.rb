@@ -7,9 +7,9 @@ module TicTacToeGame
     def initialize
       @board = GameBoard.new
       puts 'Player One Info:'
-      @player1 = HumanPlayer.new(input_player_name, "X")
+      @player1 = HumanPlayer.new(input_player_name, 'X')
       puts 'Player Two Info:'
-      @player2 = HumanPlayer.new(input_player_name, "O")
+      @player2 = HumanPlayer.new(input_player_name, 'O')
       @next_player = @player1
       play_game
     end
@@ -17,7 +17,9 @@ module TicTacToeGame
     def play_game
       until game_over?
         move = get_move(@next_player)
-        @board.fill_space(move, next_move.symbol) if move_is_valid?
+        next unless @board.space_empty?(move)
+
+        @board.fill_space(move, next_move.symbol)
         @next_player =
           @next_player == @player1 ? @player2 : @player1
       end
@@ -34,10 +36,6 @@ module TicTacToeGame
       puts "Available moves: #{available_moves}"
       puts 'Type your next move from available list:'
       gets.chomp
-    end
-
-    def move_is_valid?(move)
-      @board.available_spaces.keys.includes?(move)
     end
 
     def game_over?
@@ -65,10 +63,10 @@ module TicTacToeGame
       (@grid[location]).zero?
     end
 
-    def available_spaces()
+    def available_spaces
       @grid.select { |_, symbol| symbol.zero? }
     end
-    #TODO: ADD to_s method for the game board.
+    # TODO: ADD to_s method for the game board.
   end
 
   class HumanPlayer
