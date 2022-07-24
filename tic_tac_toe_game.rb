@@ -19,13 +19,17 @@ module TicTacToeGame
     def play_game
       loop do
         move = get_move(@current_player)
-        next unless @board.space_empty?(move) && @board.available_spaces.keys.include(move)
+        next unless @board.available_spaces.include?(move)
 
-        @board.fill_space(move, @current_player.symbol)
+        # puts 'Looped'
+        #  puts @board.grid_numbers
+        @board.fill_space(@board.grid_names[move], @current_player.symbol)
         break if game_over?(move)
 
         @current_player =
           @current_player == @player1 ? @player2 : @player1
+
+        @board.display_board
       end
       show_game_over
     end
@@ -36,24 +40,22 @@ module TicTacToeGame
     end
 
     def get_move(current_player)
-      available_moves = @board.available_spaces.keys
+      available_moves = @board.available_spaces
       puts "#{current_player.name}\'s turn"
       puts "Available moves: #{available_moves}"
       puts 'Type your next move from available list:'
-      gets.chomp
+      gets.chomp.to_sym
     end
 
     def game_over?(last_move)
-      # PLACEHOLDER, NEEDS TO BE IMPLEMENTED
-      # check for win condition for player who most recently 
-      # made a move (will be opposite of next_player)
-      move_index = @board.grid_names.value(last_move)
-      return three_in_a_row?(move_index) || three_in_a_column?(move_index) || three_in_a_diagonal?(move_index)
-      # check diagonals of last_move  
+      move_index = @board.grid_names[last_move]
+      p move_index
+      three_in_a_row?(move_index) || three_in_a_column?(move_index) || three_in_a_diagonal?(move_index)
     end
 
     def show_game_over
       # TO BE IMPLEMENTED
+      puts 'This is the game over screen'
     end
 
     def three_in_a_row?(move_index)
@@ -83,29 +85,36 @@ module TicTacToeGame
   end
 
   class GameBoard
-
     attr_reader :grid_numbers, :grid_names
+
     def initialize
       @grid_names = { topLeft: 0, topMiddle: 1, topRight: 2,
                       middleLeft: 3, middle: 4, middleRight: 5,
                       bottomLeft: 6, bottomMiddle: 7, bottomRight: 8 }
-      @grid_numbers = Array.new(9)
+      @grid_numbers = Array.new(9, ' ')
     end
 
-    def fill_space(int_location, symbol)
-      @grid_numbers[int_location] = symbol
+    def fill_space(int_location, playerSymbol)
+      @grid_numbers[int_location] = playerSymbol
+      puts @grid_numbers
     end
 
     def space_empty?(int_location)
-      (@grid_numbers[int_location]).zero?
+      @grid_numbers[int_location] == ' '
     end
 
     def available_spaces
-      available_indices = @grid_numbers.each_index.select { |idx| @grid_numbers[idx].zero? }
-      available_indices.map { |number| @grid_names.key(number)}
+      available_indices = @grid_numbers.each_index.select { |idx| @grid_numbers[idx] == ' ' }
+      available_indices.map { |number| @grid_names.key(number) }
     end
-    
-    # TODO: ADD to_s method the game board.
+
+    def display_board
+      puts " #{@grid_numbers[0]} | #{@grid_numbers[1]} | #{@grid_numbers[2]}"
+      puts '-----------'
+      puts " #{@grid_numbers[3]} | #{@grid_numbers[4]} | #{@grid_numbers[5]}"
+      puts '-----------'
+      puts " #{@grid_numbers[6]} | #{@grid_numbers[7]} | #{@grid_numbers[8]}"
+    end
   end
 
   class HumanPlayer
