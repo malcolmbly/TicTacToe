@@ -21,17 +21,21 @@ module TicTacToeGame
         move = get_move(@current_player)
         next unless @board.available_spaces.include?(move)
 
-        # puts 'Looped'
-        #  puts @board.grid_numbers
         @board.fill_space(@board.grid_names[move], @current_player.symbol)
-        break if game_over?(move)
+        @board.display_board
+        if game_won?(move)
+          show_game_win
+          break
+        end
+
+        if game_tied?
+          show_tie_game
+          break
+        end
 
         @current_player =
           @current_player == @player1 ? @player2 : @player1
-
-        @board.display_board
       end
-      show_game_over
     end
 
     def input_player_name
@@ -47,21 +51,27 @@ module TicTacToeGame
       gets.chomp.to_sym
     end
 
-    def game_over?(last_move)
+    def game_won?(last_move)
       move_index = @board.grid_names[last_move]
-      p move_index
       three_in_a_row?(move_index) || three_in_a_column?(move_index) || three_in_a_diagonal?(move_index)
     end
 
-    def show_game_over
-      # TO BE IMPLEMENTED
-      puts 'This is the game over screen'
+    def show_game_win
+      puts "GAME OVER, #{@current_player.name} wins!"
+    end
+
+    def game_tied?
+      @board.available_spaces.length.zero?
+    end
+
+    def show_tie_game
+      puts 'GAME OVER, it\'s a draw!'
     end
 
     def three_in_a_row?(move_index)
       row = move_index / 3
 
-      @board.grid_numbers[row * 3] == @board.grid_numbers[row * 3 + 1] && 
+      @board.grid_numbers[row * 3] == @board.grid_numbers[row * 3 + 1] &&
         @board.grid_numbers[row * 3] == @board.grid_numbers[row * 3 + 2]
     end
 
@@ -73,10 +83,11 @@ module TicTacToeGame
     end
 
     def three_in_a_diagonal?(move_index)
-      if move_index.even?
+      if move_index.even? && @board.grid_numbers[0] == @current_player.symbol
         (@board.grid_numbers[0] == @board.grid_numbers[4] &&
-          @board.grid_numbers[0] == @board.grid_numbers[8]) ||
-          (@board.grid_numbers[2] == @board.grid_numbers[4] &&
+          @board.grid_numbers[0] == @board.grid_numbers[8])
+      elsif move_index.even? && @board.grid_numbers[2] == @current_player.symbol
+        (@board.grid_numbers[2] == @board.grid_numbers[4] &&
           @board.grid_numbers[2] == @board.grid_numbers[6])
       else
         false
@@ -96,7 +107,6 @@ module TicTacToeGame
 
     def fill_space(int_location, playerSymbol)
       @grid_numbers[int_location] = playerSymbol
-      puts @grid_numbers
     end
 
     def space_empty?(int_location)
